@@ -2,13 +2,15 @@ const express = require("express");
 const app = express();
 app.use(express.json());
 const { getTopics } = require("./controllers/topics-controllers");
+const { getEndPoints } = require("./controllers/api-controllers");
+
+app.get("/api", getEndPoints);
 
 app.get("/api/topics", getTopics);
 
 app.use((err, req, res, next) => {
-  console.log(err, "here!!");
   if (err.message === "Not Found") {
-    res.status(404).send({ message: "Page Not Found" });
+    res.status(404).send({ message: "Not Found" });
   }
   next(err);
 });
