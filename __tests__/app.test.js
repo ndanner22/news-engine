@@ -20,7 +20,7 @@ describe("api/topics", () => {
         });
       });
   });
-  test.only("GET:404 returns Page Not Found", () => {
+  test("GET:404 returns Page Not Found", () => {
     return request(app).get("/api/topis").expect(404);
   });
 });
