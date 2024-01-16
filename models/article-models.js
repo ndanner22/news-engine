@@ -25,3 +25,17 @@ exports.fetchArticleById = (articleId) => {
       return rows[0];
     });
 };
+
+exports.fetchCommentsByArticleId = (articleId) => {
+  return db
+    .query(
+      `SELECT * FROM comments WHERE article_id=$1 ORDER BY created_at DESC`,
+      [articleId]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ message: "Not Found" });
+      }
+      return rows;
+    });
+};

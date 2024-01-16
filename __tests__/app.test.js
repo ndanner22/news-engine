@@ -98,6 +98,45 @@ describe("/api/articles/:article_id", () => {
       });
   });
 });
+describe("/api/articles/:article-id/comments", () => {
+  test("GET:200 - responds with a 200 status code", () => {
+    return request(app).get("/api/articles/1/comments").expect(200);
+  });
+  test("GET:200 - responds with an array of objects containing comment_id, votes, created_at, author, body, article_id", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBeGreaterThan(0);
+        expect(body.length).toBe(11);
+        body.forEach((comment) => {
+          expect(typeof comment.comment_id).toBe("number");
+          expect(typeof comment.votes).toBe("number");
+          expect(typeof comment.created_at).toBe("string");
+          expect(typeof comment.author).toBe("string");
+          expect(typeof comment.body).toBe("string");
+          expect(typeof comment.article_id).toBe("number");
+        });
+      });
+  });
+  test("GET:404 - responds with message: Not Found when a valid, non-existing article_id is given", () => {
+    return request(app)
+      .get("/api/articles/9999/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Not Found");
+      });
+  });
+  test("GET:400 - responds with message: Bad Request when a non-valid article_id is given", () => {
+    return request(app)
+      .get("/api/articles/not-a-valid-id/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+});
 describe("404 error status", () => {
   test("GET:404 returns a 404 error status", () => {
     return request(app).get("/api/topis").expect(404);
