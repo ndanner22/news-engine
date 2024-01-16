@@ -25,7 +25,7 @@ describe("api/topics", () => {
     return request(app).get("/api/topis").expect(404);
   });
 });
-describe.only("/api", () => {
+describe("/api", () => {
   test("GET:200 returns an object describing all available endpoints on API", () => {
     return request(app)
       .get("/api")
