@@ -31,7 +31,6 @@ describe.only("/api", () => {
       .get("/api")
       .expect(200)
       .then(({ body }) => {
-        console.log(__dirname);
         expect(Object.keys(body).length).toBeGreaterThan(0);
         expect(body).toEqual(endPoints);
       });
