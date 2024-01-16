@@ -3,6 +3,7 @@ const db = require("../db/connection");
 const seed = require("../db/seeds/seed");
 const app = require("../app");
 const testData = require("../db/data/test-data/index");
+const endPoints = require("../endpoints.json");
 
 beforeEach(() => seed(testData));
 
@@ -20,7 +21,18 @@ describe("api/topics", () => {
         });
       });
   });
-  test("GET:404 returns Page Not Found", () => {
+  test("GET:404 returns a 404 error status", () => {
     return request(app).get("/api/topis").expect(404);
+  });
+});
+describe("/api", () => {
+  test("GET:200 returns an object describing all available endpoints on API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Object.keys(body).length).toBeGreaterThan(0);
+        expect(body).toEqual(endPoints);
+      });
   });
 });
