@@ -15,14 +15,12 @@ describe("api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
+        expect(body.length).toBeGreaterThan(0);
         body.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
         });
       });
-  });
-  test("GET:404 returns a 404 error status", () => {
-    return request(app).get("/api/topis").expect(404);
   });
 });
 describe("/api", () => {
@@ -34,5 +32,10 @@ describe("/api", () => {
         expect(Object.keys(body).length).toBeGreaterThan(0);
         expect(body).toEqual(endPoints);
       });
+  });
+});
+describe("404 error status", () => {
+  test("GET:404 returns a 404 error status", () => {
+    return request(app).get("/api/topis").expect(404);
   });
 });
