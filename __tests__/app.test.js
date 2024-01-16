@@ -34,7 +34,32 @@ describe("/api", () => {
       });
   });
 });
-describe.only("/api/articles/:article_id", () => {
+describe("/api/articles", () => {
+  test("GET:200 - responds with a 200 status code", () => {
+    return request(app).get("/api/articles").expect(200);
+  });
+  test("GET:200 - responds with an array of objects in descending order by created_at(date), each containing the keys article_id, title, topic, author, created_at, votes, article_img_url. The body key should not be present", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBeGreaterThan(0);
+        expect(body.length).toBe(13);
+        expect(typeof body[0].article_id).toBe("number");
+        expect(typeof body[0].title).toBe("string");
+        expect(typeof body[0].topic).toBe("string");
+        expect(typeof body[0].author).toBe("string");
+        expect(typeof body[0].created_at).toBe("string");
+        expect(typeof body[0].votes).toBe("number");
+        expect(typeof body[0].article_img_url).toBe("string");
+        expect(typeof body[0].comment_count).toBe("number");
+        expect(typeof body[0].body).toBe("undefined");
+        expect(body).toBeSortedBy("created_at");
+      });
+  });
+});
+describe("/api/articles/:article_id", () => {
   test("GET: 200 - responds with a 200 status code", () => {
     return request(app).get("/api/articles/1").expect(200);
   });
