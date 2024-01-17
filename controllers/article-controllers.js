@@ -1,7 +1,9 @@
+const { checkArticleIdExists } = require("../db/seeds/utils");
 const {
   fetchArticleById,
   fetchArticles,
   fetchCommentsByArticleId,
+  addCommentByArticleId,
 } = require("../models/article-models");
 
 exports.getArticles = (req, res, next) => {
@@ -29,8 +31,22 @@ exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   fetchCommentsByArticleId(article_id)
     .then((rows) => {
-      console.log(rows);
       res.status(200).send(rows);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postCommentByArticleId = (req, res, next) => {
+  const { body } = req;
+  const { article_id } = req.params;
+  const articleExistenceQuery = checkArticleIdExists(article_id);
+  const addComment = addCommentByArticleId(article_id, body);
+  Promise.all([addComment, articleExistenceQuery])
+    .then((data) => {
+      const newComment = data[0];
+      res.status(201).send({ new_comment: newComment });
     })
     .catch((err) => {
       next(err);

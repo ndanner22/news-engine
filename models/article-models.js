@@ -1,9 +1,11 @@
 const db = require("../db/connection");
+const format = require("pg-format");
+const { convertTimestampToDate } = require("../db/seeds/utils");
 
 exports.fetchArticles = () => {
   return db
     .query(
-      `SELECT article_id, title, topic, author, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE articles.article_id=comments.article_id) AS INTEGER) AS comment_count FROM articles ORDER BY created_at`
+      `SELECT article_id, title, topic, author, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE articles.article_id=comments.article_id) AS INTEGER) AS comment_count FROM articles ORDER BY created_at DESC`
     )
     .then(({ rows }) => {
       return rows;
@@ -38,4 +40,16 @@ exports.fetchCommentsByArticleId = (articleId) => {
       }
       return rows;
     });
+};
+
+exports.addCommentByArticleId = (articleId, newComment) => {
+  const date = Date.now();
+  const newDate = new Date(date);
+  const sqlQuery = format(
+    `INSERT INTO comments (body, author, article_id, votes, created_at) VALUES %L RETURNING *;`,
+    [[newComment.body, newComment.username, articleId, 0, newDate]]
+  );
+  return db.query(sqlQuery).then(({ rows }) => {
+    return rows[0];
+  });
 };
