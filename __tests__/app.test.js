@@ -56,9 +56,6 @@ describe("/api/articles", () => {
   });
 });
 describe("/api/articles/:article_id", () => {
-  test("GET: 200 - responds with a 200 status code", () => {
-    return request(app).get("/api/articles/1").expect(200);
-  });
   test("GET:200 - responds with a single article object containing the properties auther, title, article_id, body, topic, created_at, votes, article_img_url", () => {
     return request(app)
       .get("/api/articles/1")
@@ -93,11 +90,94 @@ describe("/api/articles/:article_id", () => {
         expect(body.message).toBe("Bad Request");
       });
   });
+  test("PATCH:202 - responds with a single article object containing all properties with the votes value updated by a positive increment", () => {
+    const newInfo = { inc_votes: 8 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newInfo)
+      .expect(202)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 108,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH:202 - responds with a single article object containing all properties with the votes value updated by a negative increment", () => {
+    const newInfo = { inc_votes: -8 };
+
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newInfo)
+      .expect(202)
+      .then(({ body }) => {
+        const { updatedArticle } = body;
+        expect(updatedArticle).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 92,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  test("PATCH:404 - responds with message: Article Not Found when a valid, non-existing article_id is given", () => {
+    const newInfo = { inc_votes: -8 };
+
+    return request(app)
+      .patch("/api/articles/9999")
+      .send(newInfo)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article Not Found");
+      });
+  });
+  test("PATCH:400 - responds with message: Bad Request when a non-valid article_id is given", () => {
+    const newInfo = { inc_votes: -8 };
+
+    return request(app)
+      .patch("/api/articles/not-a-valid-id")
+      .send(newInfo)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+  test("PATCH:400 - responds with message: Bad Request: No Information Given when an empty information field is sent", () => {
+    const newInfo = {};
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request: No Information Given");
+      });
+  });
+  test("PATCH:400 - responds with message: Bad Request when an invalid data type given", () => {
+    const newInfo = { inc_votes: "Please increase votes by 8" };
+    return request(app)
+      .patch("/api/articles/1")
+      .send(newInfo)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
 });
 describe("/api/articles/:article-id/comments", () => {
-  test("GET:200 - responds with a 200 status code", () => {
-    return request(app).get("/api/articles/1/comments").expect(200);
-  });
   test("GET:200 - responds with an array of objects containing comment_id, votes, created_at, author, body, article_id", () => {
     return request(app)
       .get("/api/articles/1/comments")
@@ -167,7 +247,7 @@ describe("/api/articles/:article-id/comments", () => {
         expect(body.message).toBe("Article Not Found");
       });
   });
-  test("POST:400 - responds with message: Bad Request when a non valid article_id is given", () => {
+  test("POST:400 - responds with message: Bad Request when a non-valid article_id is given", () => {
     const newComment = {
       username: "icellusedkars",
       body: "This is such a good comment",

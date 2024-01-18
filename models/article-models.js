@@ -53,3 +53,22 @@ exports.addCommentByArticleId = (articleId, newComment) => {
     return rows[0];
   });
 };
+
+exports.adjustArticleVotesById = (articleId, voteChange) => {
+  if (voteChange === undefined) {
+    return Promise.reject({ message: "Bad Request: No Information Given" });
+  }
+  return db
+    .query(
+      `
+  UPDATE articles
+  SET votes = votes + $1
+  WHERE article_id = $2
+  RETURNING *`,
+      [voteChange, articleId]
+    )
+    .then(({ rows }) => {
+      console.log(rows[0]);
+      return rows[0];
+    });
+};
