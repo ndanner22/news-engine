@@ -11,8 +11,11 @@ const {
   patchArticleById,
 } = require("./controllers/article-controllers");
 const { deleteCommentById } = require("./controllers/comments-controllers");
+const { getUsers } = require("./controllers/users-controllers");
 
 app.get("/api", getEndPoints);
+
+app.get("/api/users", getUsers);
 
 app.get("/api/topics", getTopics);
 
