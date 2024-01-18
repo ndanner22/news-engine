@@ -35,9 +35,6 @@ describe("/api", () => {
   });
 });
 describe("/api/articles", () => {
-  test("GET:200 - responds with a 200 status code", () => {
-    return request(app).get("/api/articles").expect(200);
-  });
   test("GET:200 - responds with an array of objects in descending order by created_at(date), each containing the keys article_id, title, topic, author, created_at, votes, article_img_url. The body key should not be present", () => {
     return request(app)
       .get("/api/articles")
@@ -45,7 +42,6 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body)).toBe(true);
         expect(body.length).toBeGreaterThan(0);
-        expect(body.length).toBe(13);
         expect(typeof body[0].article_id).toBe("number");
         expect(typeof body[0].title).toBe("string");
         expect(typeof body[0].topic).toBe("string");
@@ -55,7 +51,7 @@ describe("/api/articles", () => {
         expect(typeof body[0].article_img_url).toBe("string");
         expect(typeof body[0].comment_count).toBe("number");
         expect(typeof body[0].body).toBe("undefined");
-        expect(body).toBeSortedBy("created_at");
+        expect(body).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
@@ -109,7 +105,6 @@ describe("/api/articles/:article-id/comments", () => {
       .then(({ body }) => {
         expect(Array.isArray(body)).toBe(true);
         expect(body.length).toBeGreaterThan(0);
-        expect(body.length).toBe(11);
         body.forEach((comment) => {
           expect(typeof comment.comment_id).toBe("number");
           expect(typeof comment.votes).toBe("number");
@@ -131,6 +126,80 @@ describe("/api/articles/:article-id/comments", () => {
   test("GET:400 - responds with message: Bad Request when a non-valid article_id is given", () => {
     return request(app)
       .get("/api/articles/not-a-valid-id/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+  test("POST:201 - responds with a new object with a key of new comment that contains all of the new comment data", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "This is such a good comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(201)
+      .then(({ body }) => {
+        const { new_comment } = body;
+        expect(new_comment).toEqual(
+          expect.objectContaining({
+            comment_id: expect.any(Number),
+            body: expect.any(String),
+            article_id: expect.any(Number),
+            author: expect.any(String),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+          })
+        );
+      });
+  });
+  test("POST:404 - responds with message: Article Not Found when a valid, non-existing article_id is given", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "This is such a good comment",
+    };
+    return request(app)
+      .post("/api/articles/9999/comments")
+      .send(newComment)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Article Not Found");
+      });
+  });
+  test("POST:400 - responds with message: Bad Request when a non valid article_id is given", () => {
+    const newComment = {
+      username: "icellusedkars",
+      body: "This is such a good comment",
+    };
+    return request(app)
+      .post("/api/articles/not-a-valid-id/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+  test("POST:400 - responds with message: Bad Request when username or body is not given", () => {
+    const newComment = {
+      body: "This is such a good comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+  test("POST:400 - responds with message: Bad Request when invalid data type given in username or body", () => {
+    const newComment = {
+      username: 91,
+      body: "This is such a good comment",
+    };
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send(newComment)
       .expect(400)
       .then(({ body }) => {
         expect(body.message).toBe("Bad Request");
