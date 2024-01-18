@@ -10,6 +10,7 @@ const {
   postCommentByArticleId,
   patchArticleById,
 } = require("./controllers/article-controllers");
+const { deleteCommentById } = require("./controllers/comments-controllers");
 
 app.get("/api", getEndPoints);
 
@@ -25,12 +26,17 @@ app.post("/api/articles/:article_id/comments", postCommentByArticleId);
 
 app.patch("/api/articles/:article_id", patchArticleById);
 
+app.delete("/api/comments/:comment_id", deleteCommentById);
+
 app.use((err, req, res, next) => {
   if (err.message === "Not Found") {
     res.status(404).send({ message: "Not Found" });
   }
   if (err.message === "Article Not Found") {
     res.status(404).send({ message: "Article Not Found" });
+  }
+  if (err.message === "Comment Not Found") {
+    res.status(404).send({ message: "Comment Not Found" });
   }
   if (err.message === "Bad Request: No Information Given") {
     res.status(400).send({ message: "Bad Request: No Information Given" });

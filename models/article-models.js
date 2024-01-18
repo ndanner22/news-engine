@@ -68,7 +68,6 @@ exports.adjustArticleVotesById = (articleId, voteChange) => {
       [voteChange, articleId]
     )
     .then(({ rows }) => {
-      console.log(rows[0]);
       return rows[0];
     });
 };
