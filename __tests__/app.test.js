@@ -286,6 +286,28 @@ describe("/api/articles/:article-id/comments", () => {
       });
   });
 });
+
+describe("/api/comments/:comment_id", () => {
+  test("DELETE:204 - should respond with 204 status when a comment is deleted", () => {
+    return request(app).delete("/api/comments/1").expect(204);
+  });
+  test("DELETE:404 - responds with message: Comment Not Found when a valid, non-existing article_id is given", () => {
+    return request(app)
+      .delete("/api/comments/9999")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Comment Not Found");
+      });
+  });
+  test("DELETE:400 - responds with message: Bad Request when a non-valid article_id is given", () => {
+    return request(app)
+      .delete("/api/comments/not-a-valid-id")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe("Bad Request");
+      });
+  });
+});
 describe("404 error status", () => {
   test("GET:404 returns a 404 error status", () => {
     return request(app).get("/api/topis").expect(404);
