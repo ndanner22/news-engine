@@ -41,8 +41,17 @@ app.use((err, req, res, next) => {
   if (err.message === "Comment Not Found") {
     res.status(404).send({ message: "Comment Not Found" });
   }
+  if (err.message === "Topic Not Found") {
+    res.status(404).send({ message: "Topic Not Found" });
+  }
+  if (err.message === "Not A Valid Query") {
+    res.status(404).send({ message: "Not A Valid Query" });
+  }
   if (err.message === "Bad Request: No Information Given") {
     res.status(400).send({ message: "Bad Request: No Information Given" });
+  }
+  if (err.message === "Bad Request") {
+    res.status(400).send({ message: "Bad Request" });
   }
   next(err);
 });
