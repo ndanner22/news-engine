@@ -9,6 +9,17 @@ beforeEach(() => seed(testData));
 
 afterAll(() => db.end());
 
+describe("/api", () => {
+  test("GET:200 returns an object describing all available endpoints on API", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Object.keys(body).length).toBeGreaterThan(0);
+        expect(body).toEqual(endPoints);
+      });
+  });
+});
 describe("api/topics", () => {
   test("GET:200 returns topic data", () => {
     return request(app)
@@ -20,17 +31,6 @@ describe("api/topics", () => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
         });
-      });
-  });
-});
-describe("/api", () => {
-  test("GET:200 returns an object describing all available endpoints on API", () => {
-    return request(app)
-      .get("/api")
-      .expect(200)
-      .then(({ body }) => {
-        expect(Object.keys(body).length).toBeGreaterThan(0);
-        expect(body).toEqual(endPoints);
       });
   });
 });
@@ -308,8 +308,25 @@ describe("/api/comments/:comment_id", () => {
       });
   });
 });
+describe("/api/users", () => {
+  test("GET:200 returns an array with each element containing a user object that contains username, name, avatar_url", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body }) => {
+        const { users } = body;
+        expect(Array.isArray(users)).toBe(true);
+        expect(users.length).toBeGreaterThan(0);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
+});
 describe("404 error status", () => {
-  test("GET:404 returns a 404 error status", () => {
+  test("GET:404 returns a 404 error status when a get/api/non-existent-location is entered, (ie - /api/topis or /api/uses", () => {
     return request(app).get("/api/topis").expect(404);
   });
 });
