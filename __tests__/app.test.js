@@ -248,7 +248,7 @@ describe("/api/articles/:article-id/comments", () => {
       .expect(200)
       .then(({ body }) => {
         expect(Array.isArray(body)).toBe(true);
-        expect(body.length).toBeGreaterThan(0);
+        expect(body.length).toBe(11);
         body.forEach((comment) => {
           expect(typeof comment.comment_id).toBe("number");
           expect(typeof comment.votes).toBe("number");
@@ -256,15 +256,26 @@ describe("/api/articles/:article-id/comments", () => {
           expect(typeof comment.author).toBe("string");
           expect(typeof comment.body).toBe("string");
           expect(typeof comment.article_id).toBe("number");
+          expect(body).toBeSortedBy("created_at", { descending: true });
         });
       });
   });
-  test("GET:404 - responds with message: Not Found when a valid, non-existing article_id is given", () => {
+  test("GET:200 - responds with an empty array when given an existing article_id that has no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBe(0);
+        expect(body).toEqual([]);
+      });
+  });
+  test("GET:404 - responds with message: Article Not Found when a valid, non-existing article_id is given", () => {
     return request(app)
       .get("/api/articles/9999/comments")
       .expect(404)
       .then(({ body }) => {
-        expect(body.message).toBe("Not Found");
+        expect(body.message).toBe("Article Not Found");
       });
   });
   test("GET:400 - responds with message: Bad Request when a non-valid article_id is given", () => {

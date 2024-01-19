@@ -37,9 +37,12 @@ exports.getArticleById = (req, res, next) => {
 
 exports.getCommentsByArticleId = (req, res, next) => {
   const { article_id } = req.params;
-  fetchCommentsByArticleId(article_id)
+  const fetchQuery = fetchCommentsByArticleId(article_id);
+  const articleExistsQuery = checkArticleIdExists(article_id);
+
+  Promise.all([fetchQuery, articleExistsQuery])
     .then((rows) => {
-      res.status(200).send(rows);
+      res.status(200).send(rows[0]);
     })
     .catch((err) => {
       next(err);
