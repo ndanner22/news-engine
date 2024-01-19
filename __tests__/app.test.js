@@ -93,7 +93,7 @@ describe("/api/articles", () => {
   });
   test("GET:404 - responds with message: Bad Request when given a valid, non-existing query, ", () => {
     return request(app)
-      .get("/api/articles?toic=neil")
+      .get("/api/articles?toic=mitch")
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("Not A Valid Query");
@@ -106,7 +106,7 @@ describe("/api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) =>
-        expect(body).toEqual({
+        expect(body).toMatchObject({
           article_id: 1,
           title: "Living in the shadow of a great man",
           topic: "mitch",
@@ -220,6 +220,25 @@ describe("/api/articles/:article_id", () => {
       .then(({ body }) => {
         expect(body.message).toBe("Bad Request");
       });
+  });
+  test("GET:200 - responds with a single article object containing the properties auther, title, article_id, body, topic, created_at, votes, article_img_url, comment_count", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .expect(200)
+      .then(({ body }) =>
+        expect(body).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 11,
+        })
+      );
   });
 });
 describe("/api/articles/:article-id/comments", () => {
