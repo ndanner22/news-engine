@@ -54,6 +54,51 @@ describe("/api/articles", () => {
         expect(body).toBeSortedBy("created_at", { descending: true });
       });
   });
+  test("GET:200 - responds with an array of article objects in descending order by created_at(date based on a query with a given topic, ", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBe(12);
+        expect(typeof body[0].article_id).toBe("number");
+        expect(typeof body[0].title).toBe("string");
+        expect(typeof body[0].topic).toBe("string");
+        expect(typeof body[0].author).toBe("string");
+        expect(typeof body[0].created_at).toBe("string");
+        expect(typeof body[0].votes).toBe("number");
+        expect(typeof body[0].article_img_url).toBe("string");
+        expect(typeof body[0].comment_count).toBe("number");
+        expect(typeof body[0].body).toBe("undefined");
+        expect(body).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("GET:200 - responds with an empty array when given an existing topic that is not associated with any articles, ", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body }) => {
+        expect(Array.isArray(body)).toBe(true);
+        expect(body.length).toBe(0);
+        expect(body).toEqual([]);
+      });
+  });
+  test("GET:404 - responds with message: Topic Not Found when given a valid non-existing topic, ", () => {
+    return request(app)
+      .get("/api/articles?topic=neil")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Topic Not Found");
+      });
+  });
+  test("GET:404 - responds with message: Bad Request when given a valid, non-existing query, ", () => {
+    return request(app)
+      .get("/api/articles?toic=neil")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Not A Valid Query");
+      });
+  });
 });
 describe("/api/articles/:article_id", () => {
   test("GET:200 - responds with a single article object containing the properties auther, title, article_id, body, topic, created_at, votes, article_img_url", () => {

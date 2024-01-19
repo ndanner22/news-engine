@@ -2,14 +2,26 @@ const db = require("../db/connection");
 const format = require("pg-format");
 const { convertTimestampToDate } = require("../db/seeds/utils");
 
-exports.fetchArticles = () => {
-  return db
-    .query(
-      `SELECT article_id, title, topic, author, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE articles.article_id=comments.article_id) AS INTEGER) AS comment_count FROM articles ORDER BY created_at DESC`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+exports.fetchArticles = (query) => {
+  if (Object.keys(query).length > 0) {
+    if (!Object.keys(query).includes("topic")) {
+      return Promise.reject({ message: "Not A Valid Query" });
+    }
+  }
+  const topic = query.topic;
+
+  let sqlQuery = `SELECT article_id, title, topic, author, created_at, votes, article_img_url, CAST((SELECT COUNT(*) FROM comments WHERE articles.article_id=comments.article_id) AS INTEGER) AS comment_count FROM articles`;
+
+  if (!topic) {
+    sqlQuery = sqlQuery + ` ORDER BY created_at DESC`;
+  } else {
+    sqlQuery =
+      sqlQuery +
+      format(` WHERE topic = %L ORDER BY created_at DESC`, [[topic]]);
+  }
+  return db.query(sqlQuery).then(({ rows }) => {
+    return rows;
+  });
 };
 
 exports.fetchArticleById = (articleId) => {

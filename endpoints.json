@@ -26,6 +26,32 @@
       ]
     }
   },
+  "GET /api/articles(topic query)": {
+    "description": "serves an array of all articles matching topic query",
+    "queries": [],
+    "exampleResponse": {
+      "articles": [
+        {
+          "title": "Seafood substitutions are increasing",
+          "topic": "cooking",
+          "author": "weegembump",
+          "body": "Text from the article..",
+          "created_at": "2018-05-30T15:59:13.341Z",
+          "votes": 0,
+          "comment_count": 6
+        },
+        {
+          "title": "The Joy of Cooking",
+          "topic": "cooking",
+          "author": "Fergi",
+          "body": "It has joy",
+          "created_at": "2019-06-30T15:59:13.341Z",
+          "votes": 0,
+          "comment_count": 0
+        }
+      ]
+    }
+  },
   "GET /api/articles/article_id": {
     "description": "serves the article object that contains the matching article_id",
     "queries": [],

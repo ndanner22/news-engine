@@ -1,4 +1,4 @@
-const { checkArticleIdExists } = require("../db/seeds/utils");
+const { checkArticleIdExists, checkTopicExists } = require("../db/seeds/utils");
 const {
   fetchArticleById,
   fetchArticles,
@@ -8,9 +8,16 @@ const {
 } = require("../models/article-models");
 
 exports.getArticles = (req, res, next) => {
-  fetchArticles()
+  const { query } = req;
+  const fetchQuery = fetchArticles(query);
+  const queries = [fetchQuery];
+  if (Object.keys(query).length !== 0) {
+    const topicExistsQuery = checkTopicExists(query.topic);
+    queries.push(topicExistsQuery);
+  }
+  Promise.all(queries)
     .then((response) => {
-      res.status(200).send(response);
+      res.status(200).send(response[0]);
     })
     .catch((err) => {
       next(err);
