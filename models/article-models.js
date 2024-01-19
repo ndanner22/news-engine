@@ -48,9 +48,6 @@ exports.fetchCommentsByArticleId = (articleId) => {
       [articleId]
     )
     .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({ message: "Not Found" });
-      }
       return rows;
     });
 };
