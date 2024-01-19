@@ -1,6 +1,6 @@
-Link to live version: https://news-engine.onrender.com
+## Link to live version: https://news-engine.onrender.com/api
 
-Summary-
+## Summary
 
 This app seeds a database with four tables: news articles, users(authors), comments on the articles, and topics the articles are on.
 
@@ -14,13 +14,48 @@ From there endpoints have been created to let a client search for:
 /api/articles/:article_id/comments - will provice all comments relating to a specific article
 Additionally, a new comment can be posted, a comment can be deleted by its ID, and an article can have it's vote total altered by its ID
 
-For local use, clone the database to your computer without forking. 
-Then you will need to run
+## Local Use
+You will need to clone the repository to your local machine. Follow the below:
 
-npm init -y
-followed by
-npm install 
-After cloning this repo locally, the user should create the following two files in the main body of the repo:
+Open your terminal
+
+Navigate to directory where you want to store the project
+Run the following command in the command line:
+
+git clone https://github.com/ndanner22/news-engine.git
+
+## Dependencies
+You will need to install the following dependencies
+
+[Node.js](https://nodejs.org/en) - version 20.9.0
+
+[dotenv](https://www.npmjs.com/package/dotenv)
+
+[express](https://www.npmjs.com/package/express)
+
+[pg](https://www.npmjs.com/package/pg) - version 8.11.3
+#### Developer Dependencies
+[jest](https://www.npmjs.com/package/jest)
+
+[jest-sorted](https://www.npmjs.com/package/jest-sorted)
+
+[jest-extended](https://www.npmjs.com/package/jest-extended)
+
+[pg-format](https://www.npmjs.com/package/pg-format)
+
+[supertest](https://www.npmjs.com/package/supertest)
+
+[husky](https://www.npmjs.com/package/husky)
+
+
+## Seeding
+To seed the database run the below command in the command line
+
+npm run seed
+
+## Environment Variables
+
+You will need to create the following three files in the main body of the repo:
 
 .env.development  
   this file should contain the following line:
@@ -29,3 +64,14 @@ After cloning this repo locally, the user should create the following two files 
 .env.test
   this file should contain the following line:
     PGDATABASE=nc_news_test;
+
+.env.production
+  this file should contain the following line:
+    DATABASE_URL=<URL>
+## Testing
+
+The command 'npm test' will run all tests in the app
+
+You can access a single test file by adding the file name after the test in the above command
+
+
