@@ -26,7 +26,7 @@ describe("api/topics", () => {
       .get("/api/topics")
       .expect(200)
       .then(({ body }) => {
-        expect(body.length).toBeGreaterThan(0);
+        expect(body.length).toBe(3);
         body.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
           expect(typeof topic.description).toBe("string");
@@ -61,15 +61,18 @@ describe("/api/articles", () => {
       .then(({ body }) => {
         expect(Array.isArray(body)).toBe(true);
         expect(body.length).toBe(12);
-        expect(typeof body[0].article_id).toBe("number");
-        expect(typeof body[0].title).toBe("string");
-        expect(typeof body[0].topic).toBe("string");
-        expect(typeof body[0].author).toBe("string");
-        expect(typeof body[0].created_at).toBe("string");
-        expect(typeof body[0].votes).toBe("number");
-        expect(typeof body[0].article_img_url).toBe("string");
-        expect(typeof body[0].comment_count).toBe("number");
-        expect(typeof body[0].body).toBe("undefined");
+        body.forEach((article) => {
+          expect(article).toHaveProperty("article_id");
+          expect(article).toHaveProperty("title");
+          expect(article).toHaveProperty("topic");
+          expect(article).toHaveProperty("author");
+          expect(article).toHaveProperty("created_at");
+          expect(article).toHaveProperty("votes");
+          expect(article).toHaveProperty("article_img_url");
+          expect(article).toHaveProperty("comment_count");
+          expect(article).not.toHaveProperty("body");
+        });
+
         expect(body).toBeSortedBy("created_at", { descending: true });
       });
   });
@@ -297,16 +300,14 @@ describe("/api/articles/:article-id/comments", () => {
       .expect(201)
       .then(({ body }) => {
         const { new_comment } = body;
-        expect(new_comment).toEqual(
-          expect.objectContaining({
-            comment_id: expect.any(Number),
-            body: expect.any(String),
-            article_id: expect.any(Number),
-            author: expect.any(String),
-            votes: expect.any(Number),
-            created_at: expect.any(String),
-          })
-        );
+        expect(new_comment).toEqual({
+          comment_id: 19,
+          body: "This is such a good comment",
+          article_id: 1,
+          author: "icellusedkars",
+          votes: 0,
+          created_at: expect.any(String),
+        });
       });
   });
   test("POST:404 - responds with message: Article Not Found when a valid, non-existing article_id is given", () => {
@@ -391,7 +392,7 @@ describe("/api/users", () => {
       .then(({ body }) => {
         const { users } = body;
         expect(Array.isArray(users)).toBe(true);
-        expect(users.length).toBeGreaterThan(0);
+        expect(users.length).toBe(4);
         users.forEach((user) => {
           expect(typeof user.username).toBe("string");
           expect(typeof user.name).toBe("string");
