@@ -12,6 +12,8 @@ const {
 } = require("./controllers/article-controllers");
 const { deleteCommentById } = require("./controllers/comments-controllers");
 const { getUsers } = require("./controllers/users-controllers");
+const cors = require("cors");
+app.use(cors());
 
 app.get("/api", getEndPoints);
 
